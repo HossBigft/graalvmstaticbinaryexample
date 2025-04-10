@@ -5,6 +5,11 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 @Command(name = "greet",
         description = "Greets the provided name",
         mixinStandardHelpOptions = true,
@@ -18,10 +23,25 @@ public class GreetingApp implements Runnable {
     private boolean formal;
 
     public void run() {
+        String greeting;
         if (formal) {
-            System.out.println("Good day, " + name + "!");
+            greeting = "Good day, " + name + "!";
         } else {
-            System.out.println("Hello, " + name + "!");
+            greeting = "Hello, " + name + "!";
+        }
+
+        Path filePath = Path.of("greeting.txt");
+
+        try {
+            // Write the greeting to the file
+            Files.writeString(filePath, greeting, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            System.out.println("Writing to file: " + filePath.toAbsolutePath());
+            // Read the greeting from the file and print it
+            String content = Files.readString(filePath);
+            System.out.println(content);
+
+        } catch (IOException e) {
+            System.err.println("An error occurred: " + e.getMessage());
         }
     }
 
